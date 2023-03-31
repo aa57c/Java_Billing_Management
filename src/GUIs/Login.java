@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
 //import java.util.ArrayList;
 import java.util.Arrays;
 //import java.util.Enumeration;
@@ -15,6 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.*;
+
+import db_connection.DB_Connect;
 
 /**
  * @author ashna
@@ -29,6 +33,8 @@ public class Login extends JFrame{
 	private JTextField password;
 	private JButton loginBtn;
 	
+	private char user_type;
+	
 	final int WINDOW_WIDTH = 350;
 	final int WINDOW_HEIGHT = 250;
 	
@@ -38,8 +44,9 @@ public class Login extends JFrame{
 	/**
 	 * 
 	 */
-	public Login() {
+	public Login(char user_t) {
 		super("Sign In");
+		this.user_type = user_t;
 		setSize(400, 200);
 		setLocation(new Point(500, 300));
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -65,7 +72,7 @@ public class Login extends JFrame{
 	}
 	public void openHomeWindow() {
 		this.dispose();
-		new Home();
+		new Home(user_type);
 		
 	}
 	private class LoginBtnListener implements ActionListener{
@@ -77,12 +84,30 @@ public class Login extends JFrame{
 			
 			username = user.getText();
 			pass = password.getText();
-
-			JOptionPane.showMessageDialog(null, 
-					"Username: "+ username +
-					"\nPassword: "+ pass +
-					"\nPassword Strength: " + PasswordStrength(pass));
-			openHomeWindow();
+			
+			try {
+				DB_Connect conn = new DB_Connect();
+				CallableStatement stmt = conn.query("{call UserAuth(?, ?, ?)}");
+				stmt.setString(1, username);
+				stmt.setString(2, pass);
+				stmt.registerOutParameter(3, java.sql.Types.INTEGER);
+				stmt.execute();
+				boolean exists = stmt.getBoolean(3);
+				if(!user.getText().isEmpty() && !password.getText().isEmpty() && exists) {
+					JOptionPane.showMessageDialog(null, 
+							"Username: "+ username +
+							"\nPassword: "+ pass +
+							"\nPassword Strength: " + PasswordStrength(pass));
+					openHomeWindow();
+					
+				}
+				else if(!user.getText().isEmpty() && !password.getText().isEmpty() && !exists) {
+					JOptionPane.showMessageDialog(null, "Invalid username/password");
+				}
+			}catch(SQLException e1) {
+				e1.printStackTrace();
+				
+			}
 			
 		}
 		
@@ -120,30 +145,6 @@ public class Login extends JFrame{
 		
 
 		
-	}
-	/*
-	private boolean Authentication(String u, String p) {
-		Hashtable<String, String> validLogins = new Hashtable<String, String>();
-		validLogins.put("aa57c", "51*3LcVKRkC4vDggTTLB");
-		validLogins.put("admin", "Admin");
-		validLogins.put("user1", "hFtpLGGL7mr6vTERYPKh");
-		
-		Enumeration<String> e = validLogins.keys();
-		while(e.hasMoreElements()) {
-			String key = e.nextElement();
-			if(u == key && p == validLogins.get(key)) {
-				return true;
-			}
-			else {
-				continue;
-			}
-		}
-		return false;
-		
-	}
-	*/
-	public static void main(String args[]) {
-		new Login();
 	}
 	
 
