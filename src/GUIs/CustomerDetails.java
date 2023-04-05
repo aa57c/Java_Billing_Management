@@ -4,53 +4,48 @@
 package GUIs;
 
 import java.awt.*;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.EmptyBorder;
 
 import db_connection.DB_Connect;
-
-import java.sql.*;
 
 /**
  * @author ashna
  *
  */
 @SuppressWarnings("serial")
-public class Home extends JFrame{
+public class CustomerDetails extends JFrame {
 	private JPanel main = new JPanel();
 	private JPanel searchForCustomer = new JPanel();
 	private JPanel result = new JPanel();
-	
 	private JLabel search = new JLabel("Search for Customer: ");
 	private JTextField searchTF = new JTextField(10);
 	private JButton searchBtn = new JButton("Search!");
-	
 	private JLabel address = new JLabel("Address: ");
 	private JTextField addressTF = new JTextField(20);
 	private JLabel meterType = new JLabel("Meter Type: ");
 	private JTextField meterTypeTF = new JTextField(10);
 	
-	private char user_type;
-	
 
 	/**
 	 * 
 	 */
-	public Home(char user_t) {
-		super("Home Page");
-		this.user_type = user_t;
+	public CustomerDetails() {
+		super("Search for Customer Details");
 		buildPanel();
 		add(main, BorderLayout.NORTH);
 		setSize(600, 600);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-		
 	}
-	private void buildPanel() {
+	
+	public void buildPanel() {
 		main.setLayout(new BorderLayout());
 		main.setBorder(new EmptyBorder(20, 20, 20, 20));
 		
@@ -76,14 +71,13 @@ public class Home extends JFrame{
 		addressTF.setEditable(false);
 		meterTypeTF.setEditable(false);
 		
-		main.add(searchForCustomer, BorderLayout.NORTH);
-		main.add(result, BorderLayout.CENTER);
-		
+		main.add(searchForCustomer, BorderLayout.CENTER);
+		main.add(result, BorderLayout.SOUTH);
 	}
 	public void queryDB(String customer) {
 		try {
 			DB_Connect conn = new DB_Connect();
-			CallableStatement stmt = conn.query("{call getAddressAndMeter(?)}");
+			CallableStatement stmt = conn.query("{call GETAddressAndMeter(?)}");
 			stmt.setString(1, customer);
 			stmt.execute();
 			ResultSet rs = stmt.getResultSet();
@@ -110,6 +104,12 @@ public class Home extends JFrame{
 		
 	}
 
-	
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new CustomerDetails();
+
+	}
 
 }
