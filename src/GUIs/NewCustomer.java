@@ -117,7 +117,7 @@ public class NewCustomer extends JFrame {
 		
 		try {
 			DB_Connect conn = new DB_Connect();
-			CallableStatement stmt =  conn.query("{call CreateCustomer(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+			CallableStatement stmt =  conn.query("{call CreateCustomer(?, ?, ?, ?, ?, ?, ?, ?, ?)}");
 			stmt.setInt(1, cust_id);
 			stmt.setString(2, firstName);
 			stmt.setString(3, lastName);

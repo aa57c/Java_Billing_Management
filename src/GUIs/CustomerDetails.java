@@ -4,6 +4,7 @@
 package GUIs;
 
 import java.awt.*;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
@@ -12,6 +13,8 @@ import java.sql.SQLException;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import javax.swing.table.DefaultTableModel;
 
 import db_connection.DB_Connect;
 
@@ -22,15 +25,14 @@ import db_connection.DB_Connect;
 @SuppressWarnings("serial")
 public class CustomerDetails extends JFrame {
 	private JPanel main = new JPanel();
+	private JFrame searchResult;
+	private static JTable table;
+	private String[] columnNames = {"Customer ID", "First Name", "Last Name", "Meter Type", "Energy Tariff", "Address", "Zip Code", "Email"};
 	private JPanel searchForCustomer = new JPanel();
-	private JPanel result = new JPanel();
 	private JLabel search = new JLabel("Search for Customer: ");
 	private JTextField searchTF = new JTextField(10);
 	private JButton searchBtn = new JButton("Search!");
-	private JLabel address = new JLabel("Address: ");
-	private JTextField addressTF = new JTextField(20);
-	private JLabel meterType = new JLabel("Meter Type: ");
-	private JTextField meterTypeTF = new JTextField(10);
+	private JButton editBtn = new JButton("Edit Customer Details");
 	
 
 	/**
@@ -40,7 +42,7 @@ public class CustomerDetails extends JFrame {
 		super("Search for Customer Details");
 		buildPanel();
 		add(main, BorderLayout.NORTH);
-		setSize(600, 600);
+		setSize(500, 200);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 	}
@@ -58,49 +60,62 @@ public class CustomerDetails extends JFrame {
 		
 		searchForCustomer.setBorder(BorderFactory.createTitledBorder("Search Bar"));
 		
-		//result panel
-		result.setLayout(new GridLayout(2, 2));
-		result.add(address);
-		result.add(addressTF);
-		result.add(meterType);
-		result.add(meterTypeTF);
-		
-		result.setBorder(BorderFactory.createTitledBorder("Results"));
-		
-		//set result text fields to uneditable
-		addressTF.setEditable(false);
-		meterTypeTF.setEditable(false);
-		
 		main.add(searchForCustomer, BorderLayout.CENTER);
-		main.add(result, BorderLayout.SOUTH);
-	}
-	public void queryDB(String customer) {
-		try {
-			DB_Connect conn = new DB_Connect();
-			CallableStatement stmt = conn.query("{call GETAddressAndMeter(?)}");
-			stmt.setString(1, customer);
-			stmt.execute();
-			ResultSet rs = stmt.getResultSet();
-			if(rs.next()) {
-				if(!searchTF.getText().isEmpty()) {
-					addressTF.setText(rs.getString("address"));
-					meterTypeTF.setText(rs.getString("meterType"));
-				}
-			}
-		}catch(SQLException e) {
-			e.printStackTrace();
-		}
-		
+
 	}
 	private class SearchBtnListener implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String name_of_customer;
-			name_of_customer = searchTF.getText();
-			queryDB(name_of_customer);
+			String firstName;
+			String lastName;
+			firstName = searchTF.getText().split(" ")[0];
+			lastName = searchTF.getText().split(" ")[1];
+			showTableData(firstName, lastName);
 			
 		}
+		
+	}
+	public void showTableData(String f, String l) {
+		searchResult = new JFrame("Database Search Result");
+		searchResult.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		searchResult.setLayout(new BorderLayout());
+		DefaultTableModel model = new DefaultTableModel();
+		model.setColumnIdentifiers(columnNames);
+		table = new JTable();
+		table.setModel(model);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.setFillsViewportHeight(true);
+		JScrollPane scroll = new JScrollPane(table);
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		try {
+			DB_Connect conn = new DB_Connect();
+			CallableStatement stmt = conn.query("{call GETCustomerDetails(?, ?)}");
+			stmt.setString(1, f);
+			stmt.setString(2, l);
+			stmt.execute();
+			ResultSet rs = stmt.getResultSet();
+			if(rs.next()) {
+				model.addRow(new Object[] {rs.getString("customerID"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("meterType"), rs.getString("energyTariff"), rs.getString("address"), rs.getString("postalCode"), rs.getString("email")});
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		editBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				searchResult.dispose();
+				new EditCustomer(f, l);
+				
+			}
+			
+		});
+		searchResult.add(scroll, BorderLayout.NORTH);
+		searchResult.add(editBtn, BorderLayout.CENTER);
+		searchResult.setVisible(true);
+		searchResult.setSize(600, 600);
 		
 	}
 
