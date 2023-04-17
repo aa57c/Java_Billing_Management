@@ -27,12 +27,12 @@ public class CustomerDetails extends JFrame {
 	private JPanel main = new JPanel();
 	private JFrame searchResult;
 	private static JTable table;
-	private String[] columnNames = {"Customer ID", "First Name", "Last Name", "Meter Type", "Energy Tariff", "Address", "Zip Code", "Email"};
+	private String[] columnNames = {"Customer ID", "First Name", "Last Name", "Meter Type", "RESHRAM", "FAC", "DCIM", "STD", "Address", "Zip Code", "Email"};
 	private JPanel searchForCustomer = new JPanel();
 	private JLabel search = new JLabel("Search for Customer: ");
 	private JTextField searchTF = new JTextField(10);
 	private JButton searchBtn = new JButton("Search!");
-	private JButton editBtn = new JButton("Edit Customer Details");
+	//private JButton editBtn = new JButton("Edit Customer Details");
 	
 
 	/**
@@ -84,7 +84,7 @@ public class CustomerDetails extends JFrame {
 		model.setColumnIdentifiers(columnNames);
 		table = new JTable();
 		table.setModel(model);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		table.setFillsViewportHeight(true);
 		JScrollPane scroll = new JScrollPane(table);
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -97,11 +97,12 @@ public class CustomerDetails extends JFrame {
 			stmt.execute();
 			ResultSet rs = stmt.getResultSet();
 			if(rs.next()) {
-				model.addRow(new Object[] {rs.getString("customerID"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("meterType"), rs.getString("energyTariff"), rs.getString("address"), rs.getString("postalCode"), rs.getString("email")});
+				model.addRow(new Object[] {rs.getString("customerID"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("meterType"), rs.getString("RESHRAM_E_Rate"), rs.getString("FAC_E_Rate"), rs.getString("DCIM_E_Rate"), rs.getString("STD_E_Rate"), rs.getString("address"), rs.getString("postalCode"), rs.getString("email")});
 			}
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
+		/*
 		editBtn.addActionListener(new ActionListener() {
 
 			@Override
@@ -112,8 +113,9 @@ public class CustomerDetails extends JFrame {
 			}
 			
 		});
+		*/
 		searchResult.add(scroll, BorderLayout.NORTH);
-		searchResult.add(editBtn, BorderLayout.CENTER);
+		//searchResult.add(editBtn, BorderLayout.CENTER);
 		searchResult.setVisible(true);
 		searchResult.setSize(600, 600);
 		

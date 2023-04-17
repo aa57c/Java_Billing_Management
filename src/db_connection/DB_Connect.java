@@ -6,6 +6,7 @@ package db_connection;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
 
@@ -35,6 +36,9 @@ public class DB_Connect {
 	}
 	public CallableStatement query(String q) throws SQLException {
 		return conn.prepareCall(q);
+	}
+	public Statement createQuery() throws SQLException {
+		return conn.createStatement();
 	}
 
 }

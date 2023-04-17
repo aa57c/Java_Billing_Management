@@ -107,6 +107,9 @@ public class UserHome extends JFrame{
 			else if(msg.equals("New Customer")) {
 				new NewCustomer().setVisible(true);
 			}
+			else if(msg.equals("Generate Bill")) {
+				new GenerateInvoice().setVisible(true);
+			}
 			else if(msg.equals("Notepad")) {
 				try {
 					Runtime.getRuntime().exec("notepad.exe");
