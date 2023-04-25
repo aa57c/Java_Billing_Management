@@ -27,7 +27,7 @@ public class CustomerDetails extends JFrame {
 	private JPanel main = new JPanel();
 	private JFrame searchResult;
 	private static JTable table;
-	private String[] columnNames = {"Customer ID", "First Name", "Last Name", "Meter Type", "RESHRAM", "FAC", "DCIM", "STD", "Address", "Zip Code", "Email"};
+	private String[] columnNames = {"Customer ID", "Customer Name", "Meter Type", "RESHRAM_Rate", "FAC_Rate", "DCIM_Rate", "STD_Rate", "Address", "Zip Code", "Email"};
 	private JPanel searchForCustomer = new JPanel();
 	private JLabel search = new JLabel("Search for Customer: ");
 	private JTextField searchTF = new JTextField(10);
@@ -43,7 +43,7 @@ public class CustomerDetails extends JFrame {
 		buildPanel();
 		add(main, BorderLayout.NORTH);
 		setSize(500, 200);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setVisible(true);
 	}
 	
@@ -67,16 +67,12 @@ public class CustomerDetails extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String firstName;
-			String lastName;
-			firstName = searchTF.getText().split(" ")[0];
-			lastName = searchTF.getText().split(" ")[1];
-			showTableData(firstName, lastName);
+			showTableData(searchTF.getText());
 			
 		}
 		
 	}
-	public void showTableData(String f, String l) {
+	public void showTableData(String n) {
 		searchResult = new JFrame("Database Search Result");
 		searchResult.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		searchResult.setLayout(new BorderLayout());
@@ -84,40 +80,29 @@ public class CustomerDetails extends JFrame {
 		model.setColumnIdentifiers(columnNames);
 		table = new JTable();
 		table.setModel(model);
-		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		table.setFillsViewportHeight(true);
 		JScrollPane scroll = new JScrollPane(table);
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		try {
 			DB_Connect conn = new DB_Connect();
-			CallableStatement stmt = conn.query("{call GETCustomerDetails(?, ?)}");
-			stmt.setString(1, f);
-			stmt.setString(2, l);
+			CallableStatement stmt = conn.query("{call GETCustomerDetails(?)}");
+			stmt.setString(1, n);
 			stmt.execute();
 			ResultSet rs = stmt.getResultSet();
 			if(rs.next()) {
-				model.addRow(new Object[] {rs.getString("customerID"), rs.getString("firstName"), rs.getString("lastName"), rs.getString("meterType"), rs.getString("RESHRAM_E_Rate"), rs.getString("FAC_E_Rate"), rs.getString("DCIM_E_Rate"), rs.getString("STD_E_Rate"), rs.getString("address"), rs.getString("postalCode"), rs.getString("email")});
+				model.addRow(new Object[] {rs.getString("customerID"), rs.getString("customerName"), rs.getString("meterType"), rs.getString("RESHRAM_rate"), rs.getString("FAC_rate"), rs.getString("DCIM_rate"), rs.getString("STD_rate"), rs.getString("address"), rs.getString("postalCode"), rs.getString("email")});
 			}
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		/*
-		editBtn.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				searchResult.dispose();
-				new EditCustomer(f, l);
-				
-			}
-			
-		});
-		*/
+		
 		searchResult.add(scroll, BorderLayout.NORTH);
+		searchResult.pack();
 		//searchResult.add(editBtn, BorderLayout.CENTER);
 		searchResult.setVisible(true);
-		searchResult.setSize(600, 600);
+		searchResult.setSize(700, 600);
 		
 	}
 

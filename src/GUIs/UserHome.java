@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 import javax.swing.*;
 /**
@@ -27,7 +28,8 @@ public class UserHome extends JFrame{
 	private JMenuItem u3; //Search for Customer Deposits (payments, bills, etc.)
 	
 	private JMenu report; 
-	private JMenuItem r1; //Generate new bill for customer
+	private JMenuItem r1; //Generate new invoice for customer
+	private JMenuItem r2; //pay bill for customer
 	
 	private JMenu utility;
 	private JMenuItem ut1; //open notepad
@@ -59,7 +61,9 @@ public class UserHome extends JFrame{
 		user.setForeground(Color.RED);
 		
 		report = new JMenu("Report");
-		r1 = new JMenuItem("Generate Bill");
+		r1 = new JMenuItem("Generate Invoice");
+		r2 = new JMenuItem("Pay Bill");
+		
 		r1.addActionListener(new MenuActionListener());
 		report.setForeground(Color.RED);
 		
@@ -82,6 +86,7 @@ public class UserHome extends JFrame{
 		user.add(u3);
 		
 		report.add(r1);
+		report.add(r2);
 		
 		utility.add(ut1);
 		utility.add(ut2);
@@ -107,8 +112,11 @@ public class UserHome extends JFrame{
 			else if(msg.equals("New Customer")) {
 				new NewCustomer().setVisible(true);
 			}
-			else if(msg.equals("Generate Bill")) {
+			else if(msg.equals("Generate Invoice")) {
 				new GenerateInvoice().setVisible(true);
+			}
+			else if(msg.equals("Pay Bill")) {
+				new PayBill().setVisible(true);
 			}
 			else if(msg.equals("Notepad")) {
 				try {

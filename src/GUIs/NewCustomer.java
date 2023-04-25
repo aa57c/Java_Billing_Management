@@ -5,12 +5,12 @@ package GUIs;
 
 import java.awt.BorderLayout;
 
+
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.Hashtable;
 
 import javax.swing.*;
@@ -71,7 +71,7 @@ public class NewCustomer extends JFrame {
 		add(main, BorderLayout.NORTH);
 		setSize(600, 600);
 		pack();
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setVisible(true);		
 		
 	}
@@ -113,7 +113,6 @@ public class NewCustomer extends JFrame {
 		
 	}
 	public void buildSubmissionPanel() {
-		DecimalFormat df = new DecimalFormat("#0.0000");
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 		
 		labelTable.put(100, new JLabel("1.0"));
@@ -136,7 +135,7 @@ public class NewCustomer extends JFrame {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				DCIM_Rate.setText(df.format((float)ForDCIM.getValue() / 100));
+				DCIM_Rate.setText(String.valueOf((float) ForDCIM.getValue() / 100));
 				
 			}
 			
@@ -152,7 +151,7 @@ public class NewCustomer extends JFrame {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				FAC_Rate.setText(df.format((float)ForFAC.getValue() / 100));
+				FAC_Rate.setText(String.valueOf((float) ForFAC.getValue() / 100));
 				
 			}
 			
@@ -171,7 +170,7 @@ public class NewCustomer extends JFrame {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				STD_Rate.setText(df.format((float)ForSTD.getValue() / 100));
+				STD_Rate.setText(String.valueOf((float) ForSTD.getValue() / 100));
 				
 			}
 			
@@ -187,7 +186,7 @@ public class NewCustomer extends JFrame {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				RESHRAM_Rate.setText(df.format((float)ForRESHRAM.getValue() / 100));
+				RESHRAM_Rate.setText(String.valueOf((float) ForRESHRAM.getValue() / 100));
 				
 			}
 			

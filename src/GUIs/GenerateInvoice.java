@@ -52,7 +52,7 @@ public class GenerateInvoice extends JFrame{
 	private JTextField RESHRAM_Usage = new JTextField(10);
 	
 	private JPanel SendPnl = new JPanel();
-	private JButton generate = new JButton("Generate Bill");
+	private JButton generate = new JButton("Generate Invoice");
 	private JSlider ForDCIM = new JSlider(0, 800);
 	private JSlider ForFAC = new JSlider(0, 800);
 	private JSlider ForRESHRAM = new JSlider(0, 800);
@@ -100,9 +100,9 @@ public class GenerateInvoice extends JFrame{
 		try {
 			DB_Connect conn = new DB_Connect();
 			Statement stmt = conn.createQuery();
-			ResultSet rs = stmt.executeQuery("SELECT firstName, lastName FROM dbo.Customers WHERE customerID is not null");
+			ResultSet rs = stmt.executeQuery("SELECT customerName from dbo.Customers");
 			while(rs.next()) {
-				customers.add(rs.getString("firstName") + " " + rs.getString("lastName"));
+				customers.add(rs.getString("customerName"));
 				
 			}
 		}catch(SQLException e) {
@@ -119,23 +119,19 @@ public class GenerateInvoice extends JFrame{
 				@SuppressWarnings("unchecked")
 				JComboBox<String> box = (JComboBox<String>) e.getSource();
 				
-				String firstName = String.valueOf(box.getSelectedItem()).split(" ")[0];
-				String lastName = String.valueOf(box.getSelectedItem()).split(" ")[1];
-				
-				
+				String name = String.valueOf(box.getSelectedItem());
 				
 				try {
 					DB_Connect conn = new DB_Connect();
-					CallableStatement stmt = conn.query("{call GetMeterRates(?, ?)}");
-					stmt.setString(1, firstName);
-					stmt.setString(2, lastName);
+					CallableStatement stmt = conn.query("{call GetMeterRates(?)}");
+					stmt.setString(1, name);
 					stmt.execute();
 					ResultSet rs = stmt.getResultSet();
 					while(rs.next()) {
-						dcim_rate.setText(Float.toString(rs.getFloat("DCIM_E_Rate")));
-						fac_rate.setText(Float.toString(rs.getFloat("FAC_E_Rate")));
-						resh_rate.setText(Float.toString(rs.getFloat("RESHRAM_E_Rate")));
-						std_rate.setText(Float.toString(rs.getFloat("STD_E_Rate")));
+						dcim_rate.setText(Float.toString(rs.getFloat("DCIM_rate")));
+						fac_rate.setText(Float.toString(rs.getFloat("FAC_rate")));
+						resh_rate.setText(Float.toString(rs.getFloat("RESHRAM_rate")));
+						std_rate.setText(Float.toString(rs.getFloat("STD_rate")));
 						customer_name.setText(String.valueOf(box.getSelectedItem()));
 					}
 					
@@ -268,8 +264,7 @@ public class GenerateInvoice extends JFrame{
 				
 				double total = 0;
 				
-				int isPaid = (int) Math.round(Math.random()); 
-				//System.out.println(isPaid);
+				String status = "recieved";
 				
 				
 				if(!STD_Usage.getText().isEmpty()) {
@@ -300,27 +295,22 @@ public class GenerateInvoice extends JFrame{
 					total = std_total + dcim_total + fac_total + resh_total + Double.parseDouble(customer_chrg.getText());
 				}
 				
-				
-				String firstName = customer_name.getText().split(" ")[0];
-				String lastName = customer_name.getText().split(" ")[1];
-				
 				try {
 					DB_Connect conn = new DB_Connect();
-					CallableStatement stmt = conn.query("{call CreateBill(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
-					stmt.setString(1, firstName);
-					stmt.setString(2, lastName);
-					stmt.setFloat(3, (float) std_use);
-					stmt.setFloat(4, (float) dcim_use);
-					stmt.setFloat(5, (float) fac_use);
-					stmt.setFloat(6, (float) resh_use);
-					stmt.setFloat(7, (float) std_total);
-					stmt.setFloat(8, (float) dcim_total);
-					stmt.setFloat(9, (float) fac_total);
-					stmt.setFloat(10, (float) resh_total);
-					stmt.setFloat(11, (float) total);
-					stmt.setInt(12, isPaid);
+					CallableStatement stmt = conn.query("{call SendInvoice(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)}");
+					stmt.setString(1, customer_name.getText());
+					stmt.setFloat(2, (float) std_use);
+					stmt.setFloat(3, (float) dcim_use);
+					stmt.setFloat(4, (float) fac_use);
+					stmt.setFloat(5, (float) resh_use);
+					stmt.setFloat(6, (float) std_total);
+					stmt.setFloat(7, (float) dcim_total);
+					stmt.setFloat(8, (float) fac_total);
+					stmt.setFloat(9, (float) resh_total);
+					stmt.setFloat(10, (float) total);
+					stmt.setString(11, status);
 					stmt.execute();
-					JOptionPane.showMessageDialog(null, "Bill sent to customer!");
+					JOptionPane.showMessageDialog(null, "Invoice sent to customer!");
 					
 				}catch(SQLException e1) {
 					e1.printStackTrace();
