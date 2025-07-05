@@ -1,4 +1,4 @@
-# CS 349 Project – Customer Billing & Management System
+Java Customer Billing & Management System
 
 This is a Java Swing-based GUI application designed to manage customer data, generate invoices, and process billing. It connects to a SQL Server database via JDBC.
 
